@@ -1,18 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.Core" Version="7.1.0" />
-    <PackageReference Include="Volo.Abp.Ddd.Application" Version="7.1.0" />
-  </ItemGroup>
+		<PackageId>Naz.Abp.DynamicFilters.Application</PackageId>
+		<Version>7.1.0</Version>
+		<Authors>nicoa90</Authors>
+		<Description>Add the services you need to use dynamic filters in your GetAll endpoints.</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageIcon>icon.png</PackageIcon>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Naz.Abp.DynamicFilters.Application.Contracts\Naz.Abp.DynamicFilters.Application.Contracts.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Naz.Abp.DynamicFilters.Application.Contracts" Version="7.1.0" />
+		<PackageReference Include="Volo.Abp.Core" Version="7.1.0" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" Version="7.1.0" />
+
+		<None Include="icon.png" Pack="true" PackagePath="" />
+	</ItemGroup>
 
 </Project>

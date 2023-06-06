@@ -1,13 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Nullable>disable</Nullable>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.Core" Version="7.1.0" />
-    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="7.1.0" />
-  </ItemGroup>
+		<PackageId>Naz.Abp.DynamicFilters.Application.Contracts</PackageId>
+		<Version>7.1.0</Version>
+		<Authors>nicoa90</Authors>
+		<Description>Contracts for Naz.Abp.DynamicFilters.Application</Description>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageIcon>icon.png</PackageIcon>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Core" Version="7.1.0" />
+		<PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="7.1.0" />
+
+		<None Include="icon.png" Pack="true" PackagePath=""/>
+	</ItemGroup>
 
 </Project>

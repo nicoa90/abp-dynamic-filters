@@ -1,17 +1,16 @@
 # ABP.IO Dynamic Filters
 
-Application and Contracts modules to add the necesary services so you can add dynamic filters to your GetAll endpoints.
-
+Application and Contracts modules with the services you need to add dynamic filters to your GetAll endpoints.
 
 ## Installation
 
-You simple need to install in your ApplicationModule the package from [nuget](https://www.nuget.org/packages/Naz.Abp.DynamicFilters.Application) or:
+You simply need to install the package from [nuget](https://www.nuget.org/packages/Naz.Abp.DynamicFilters.Application) in your ApplicationModule, or:
 
 ```
 dotnet add package Naz.Abp.DynamicFilters.Application
 ```
 
-Then install in your ApplicationContractsModule the package from [nuget](https://www.nuget.org/packages/Naz.Abp.DynamicFilters.Application.Contracts) or:
+Then in your ApplicationContractsModule, install the package from [nuget](https://www.nuget.org/packages/Naz.Abp.DynamicFilters.Application.Contracts) or:
 
 ```
 dotnet add package Naz.Abp.DynamicFilters.Application.Contracts
@@ -21,94 +20,92 @@ dotnet add package Naz.Abp.DynamicFilters.Application.Contracts
 
 ### Application Module
 
-Use de defined FilteredResultRequestDto wich is an extension of PagedAndSortedResultRequestDto as the TGetListInput of your ApplicationService:
+Use the defined FilteredResultRequestDto, which is an extension of PagedAndSortedResultRequestDto, as TGetListInput of your ApplicationService:
 
-```cs
-public class ProductAppService : CrudAppService<Product, ProductDto, int, FilteredResultRequestDto>
+```cs 
+public class ProductAppService : CrudAppService
 ```
+This gives you access to Filters and Search parameters.
 
-This will give you access to Filters and Search parameters.
+Then override the CreateFilteredQueryAsync method and create the query as follows:
 
-Then override the CreateFilteredQueryAsync method and build the query as follow:
-
-```cs
-protected override async Task<IQueryable<Product>> CreateFilteredQueryAsync(FilteredResultRequestDto input)
-{
-    return DynamicFiltersBuilder<Product>
-            .Using(await base.CreateFilteredQueryAsync(input))
-            .WithFilters(input.Filters)
-            .Ignore("IgnoredFilter")
-            .WithSearch(input.Search,
-                        x => x.Name.Contains(input.Search, StringComparison.InvariantCultureIgnoreCase))
-            .Build()
-            .GetQueryable();
+```cs 
+protected override async Task<> CreateFilteredQueryAsync(FilteredResultRequestDto input)
+{ 
+    return DynamicFiltersBuilder 
+    .Using(await base.CreateFilteredQueryAsync(input)) 
+    .WithFilters(input.Filters) 
+    .Ignore("IgnoredFilter") 
+    .WithSearch(input.Search, x => x.Name.Contains(input.Search, StringComparison.InvariantCultureIgnoreCase)) 
+    .Build() 
+    .GetQueryable();
 }
 ```
 
-- DynamicFiltersBuilder implements a builder pattern for creating a Queryable for your entity (Product in this case).
-- The using method recieves de Queryable created from the base method.
-- WithFilters recieves the list of DynamicFilters to apply.
-- Ignore lets you specify a filter key to be ignored.
-- WithSearch recieves an expression to use the Search parameter. In this example we are performing a plain text search over Name and Description.
-- Build return the DynamicFilters object with the resulting Queryable, the applied filters and the ignored filters.
-- The GetQueryable method from DynamicFilters returns the queryable with all the filters and search applied.
+- DynamicFiltersBuilder implements a builder pattern to create a Queryable for your entity (in this case Product).
+- The using method receives the queryable created by the base method.
+- WithFilters receives the list of DynamicFilters to apply.
+- With Ignore you can specify a filter key to be ignored.
+- WithSearch receives an expression to use the Search parameter. In this example, a simple text search is performed using Name and Description.
+- Build returns the DynamicFilters object with the resulting queryable, filters applied, and filters ignored.
+- The GetQueryable method of DynamicFilters returns the queryable with all filters applied and the search.
 
 ### Calling the API
 
-The way to pass the Dynamic Filters through the API is with an Array of Strings with the following format:
-*nameOfTheProperty_operation_value* where:
-- NameOfTheProperty is the name of the entity's property you want yo filter
-- Operation is the name of the condition you want to use to filter
-- Value is the value to use as filter.
+DynamicFilters is passed via the API using an array of strings with the following format:
+*namederproperty_operation_value* where:
+- NamederProperty is the name of the property of the entity you want to filter
+- Operation is the name of the condition you want to use for filtering
+- Value is the value you want to use as a filter.
 
-For example to filter all products with a name starting with "mouse" and a price less than 100 you should pass:
+For example, to filter all products whose name starts with "mouse" and whose price is less than 100, you should pass this value:
 
 ```
-.../api/app/product?Filters=name_startsWith_mouse&Filters=price_lt_100
+.../api/app/product?Filters=name_begins-with_mouse&Filters=price_lt_100
 ```
 
 These are the operations you can use:
 
-| Operation     | Code          |
+| Operation | Code |
 | ------------- |:-------------:|
-| Equals        | equals        |
-| Less than     | lt            |
-| Less than or equals | lte     |
-| Greater than  | gt            |
-| Greater than or equals | gte  |
-| Not equals    | notEquals     |
-| Starts with   | startsWith    |
-| Ends with     | endsWith      |
-| Contains      | contains      |
-| Not contains  | notContains   |
-| Date is       | dateIs        |
-| Date before   | dateBefore    |
-| Date after    | dateAfter     |
-| Date is not   | dateIsNot     |
+| Equals | equals |
+| Less than | lt |
+| Less than or equals | lte |
+| Greater than | gt |
+| Greater than or equals | gte |
+| Not equals | notEquals |
+| Starts with | startsWith |
+| Ends with | endsWith |
+| Contains |
+| Not contains | notContains |
+| Date is | dateIs |
+| Date before | dateBefore |
+| Date after | dateAfter |
+| Date is not | dateIsNot |
 
 ### Expose operations
 
-If you want to have and endpoint where all the posible operations are exposed you need to:
+If you want to have an endpoint where all possible operations are available, you have to do this:
 
-- Add the module depency on your ApplicationModuleClass like this: 
+- Add the module dependency to your ApplicationModuleClass as follows:
 ```cs
 ...
 DependsOn(typeof(DynamicFiltersApplicationModule))
 ...
 public class YourApplicationModule : AbpModule
+{}
 ```
 
-- Add the module to the ConventionalControllers in your HostModule definition 
+- Add the module to the ConventionalControllers in your HostModule definition
 
-```cs
-private void ConfigureConventionalControllers()
-    {
-        Configure<AbpAspNetCoreMvcOptions>(options =>
-        {
-            options.ConventionalControllers.Create(typeof(YourApplicationModule).Assembly);
-            options.ConventionalControllers.Create(typeof(DynamicFiltersApplicationModule).Assembly);
-        });
-    }
+```cs 
+private void ConfigureConventionalControllers() 
+{ 
+    Configure(options => { 
+        options.ConventionalControllers.Create(typeof(YourApplicationModule).Assembly); 
+        options.ConventionalControllers.Create(typeof(DynamicFiltersApplicationModule).Assembly); 
+    }); 
+}
 ```
 
-When you run the API you will see a new Api group called DynamicFilters with a Get endpoint.
+When you run the API, you will see a new api group named DynamicFilters with a Get endpoint.
